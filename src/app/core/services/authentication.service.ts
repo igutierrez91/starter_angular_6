@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable()
 export class AuthenticationService {
@@ -12,22 +15,23 @@ export class AuthenticationService {
         }
     };
 
-    tokenKey: string = "a6smm_utoken"
+    tokenKey: string = 'a6smm_utoken';
+    isLoginSubject: BehaviorSubject<boolean> = new BehaviorSubject(this.getToken());
 
     constructor(private router: Router) { }
 
     login(username, password) {
         this.setToken(this.token);
+        localStorage.setItem('token', 'JWT');
+        this.isLoginSubject.next(true);
         this.router.navigate(['admin', 'dashboard']);
     }
 
     logout() {
         this.removeToken();
+        localStorage.removeItem('token');
+        this.isLoginSubject.next(false);
         this.router.navigate(['login']);
-    }
-
-    getToken() {
-        return JSON.parse(localStorage.getItem(this.tokenKey));
     }
 
     setToken(token) {
@@ -35,18 +39,7 @@ export class AuthenticationService {
     }
 
     getAccessToken() {
-        return JSON.parse(localStorage.getItem(this.tokenKey))['access_token'];
-    }
-
-    isAuthenticated() {
-        let token = localStorage.getItem(this.tokenKey);
-
-        if (token) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return JSON.parse(localStorage.getItem(this.tokenKey));
     }
 
     refreshToken() {
@@ -56,6 +49,14 @@ export class AuthenticationService {
 
     removeToken() {
         localStorage.removeItem(this.tokenKey);
+    }
+
+    private getToken(): boolean {
+        return !!localStorage.getItem('token');
+    }
+
+    isLoggedIn(): Observable <boolean> {
+        return this.isLoginSubject.asObservable();
     }
 
 }

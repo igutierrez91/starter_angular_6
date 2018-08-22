@@ -3,15 +3,17 @@ import { Routes, RouterModule } from '@angular/router';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { AuthGuardService } from './services/auth-guard.service';
 import { LoginComponent } from './login/login.component';
+import { HomeGuardService } from './services/home-guard.service';
 
 const routes: Routes = [
     {
         path: '',
-        redirectTo: 'form',
+        redirectTo: 'login',
         pathMatch: 'full'
     },
     {
         path: 'login',
+        canActivate: [HomeGuardService],
         component: LoginComponent
     },
     {
@@ -21,6 +23,7 @@ const routes: Routes = [
     },
     {
         path: 'form',
+        canActivate: [AuthGuardService],
         loadChildren: '../form/form.module#FormModule'
     },
     {

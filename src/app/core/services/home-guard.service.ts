@@ -3,22 +3,22 @@ import { AuthenticationService } from './authentication.service';
 import { Router } from '@angular/router';
 
 @Injectable()
-export class AuthGuardService {
+export class HomeGuardService {
 
     constructor(private authentication: AuthenticationService, private router: Router) { }
 
     canActivate(): boolean | Promise<boolean> {
         const accessToken = this.authentication.getAccessToken();
-        if (!accessToken) {
-            this.redirectToLoginPage();
+        if (accessToken) {
+            this.redirectToHomePage();
             return false;
         } else {
             return true;
         }
     }
 
-    redirectToLoginPage() {
-        this.router.navigate(['/login']);
+    redirectToHomePage() {
+        this.router.navigate(['admin', 'dashboard']);
     }
 
 }
